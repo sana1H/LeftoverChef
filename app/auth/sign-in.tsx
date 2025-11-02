@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Link, useRouter } from "expo-router";
 import CustomButton from "@/components/CustomButton";
 import CustomInput from "@/components/CustomInput";
+import { signIn } from "@/lib/appwrite";
 
 const SignIn = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -11,19 +12,22 @@ const SignIn = () => {
 
   const submit = async () => {
     if (!form.email || !form.password) {
-      return  Alert.alert(
+      return Alert.alert(
         "Error",
         "Please enter valid email address & password."
       );
-      
     }
 
     setIsSubmitting(true);
 
     try {
-      // Call Appwrite sign-in function here
-      Alert.alert("Success", "User signed in successfully.");
-      router.replace("/");
+      await signIn({ email: form.email, password: form.password });
+      Alert.alert("Success", "User signed in successfully.", [
+        {
+          text: "OK",
+          onPress: () => router.replace("/"),
+        },
+      ]);
     } catch (error: any) {
       Alert.alert("Error", error.message || "Something went wrong");
     } finally {
@@ -33,6 +37,15 @@ const SignIn = () => {
 
   return (
     <View className="gap-10 bg-white rounded-lg p-5 mt-5">
+      <View className="gap-2">
+        <Text className="text-2xl font-quicksand-bold text-dark-100">
+          Welcome Back! 👋
+        </Text>
+        <Text className="text-base text-gray-600 font-quicksand">
+          Sign in to continue sharing food and making a difference
+        </Text>
+      </View>
+
       <CustomInput
         placeholder="Enter your email"
         value={form.email}
@@ -49,7 +62,7 @@ const SignIn = () => {
         label="Password"
         secureTextEntry={true}
       />
-      <CustomButton title="Sign-In" isLoading={isSubmitting} onPress={submit} />
+      <CustomButton title="Sign In" isLoading={isSubmitting} onPress={submit} />
 
       <View className="flex justify-center mt-5 flex-row gap-2">
         <Text className="base-regular text-gray-600">
