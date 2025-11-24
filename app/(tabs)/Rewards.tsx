@@ -6,8 +6,9 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
+  ImageBackground,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 
 interface Reward {
@@ -17,7 +18,7 @@ interface Reward {
   points: number;
   category: string;
   icon: string;
-  gradient: string[];
+  color: string;
   claimed: boolean;
 }
 
@@ -29,7 +30,6 @@ interface Achievement {
   total: number;
   unlocked: boolean;
   icon: string;
-  gradient: string[];
 }
 
 export default function Rewards() {
@@ -46,7 +46,7 @@ export default function Rewards() {
       points: 100,
       category: "Food & Beverage",
       icon: "cafe",
-      gradient: ["#a855f7", "#d946ef"],
+      color: "#92400e",
       claimed: false,
     },
     {
@@ -56,7 +56,7 @@ export default function Rewards() {
       points: 200,
       category: "Food & Beverage",
       icon: "restaurant",
-      gradient: ["#ec4899", "#f472b6"],
+      color: "#dc2626",
       claimed: false,
     },
     {
@@ -66,7 +66,7 @@ export default function Rewards() {
       points: 300,
       category: "Shopping",
       icon: "cart",
-      gradient: ["#d946ef", "#f0abfc"],
+      color: "#16a34a",
       claimed: false,
     },
     {
@@ -76,7 +76,7 @@ export default function Rewards() {
       points: 400,
       category: "Entertainment",
       icon: "film",
-      gradient: ["#8b5cf6", "#c084fc"],
+      color: "#7c3aed",
       claimed: false,
     },
     {
@@ -86,7 +86,7 @@ export default function Rewards() {
       points: 500,
       category: "Wellness",
       icon: "flower",
-      gradient: ["#f472b6", "#fb923c"],
+      color: "#ec4899",
       claimed: false,
     },
   ];
@@ -100,7 +100,6 @@ export default function Rewards() {
       total: 1,
       unlocked: true,
       icon: "gift",
-      gradient: ["#a855f7", "#ec4899"],
     },
     {
       id: 2,
@@ -110,7 +109,6 @@ export default function Rewards() {
       total: 10,
       unlocked: false,
       icon: "heart",
-      gradient: ["#ec4899", "#f472b6"],
     },
     {
       id: 3,
@@ -120,7 +118,6 @@ export default function Rewards() {
       total: 100,
       unlocked: false,
       icon: "people",
-      gradient: ["#d946ef", "#f0abfc"],
     },
     {
       id: 4,
@@ -130,7 +127,6 @@ export default function Rewards() {
       total: 7,
       unlocked: false,
       icon: "calendar",
-      gradient: ["#8b5cf6", "#a855f7"],
     },
     {
       id: 5,
@@ -140,7 +136,6 @@ export default function Rewards() {
       total: 5,
       unlocked: false,
       icon: "share-social",
-      gradient: ["#f472b6", "#fb923c"],
     },
   ];
 
@@ -148,103 +143,76 @@ export default function Rewards() {
     <View style={styles.tabContent}>
       {/* Points Balance Card */}
       <LinearGradient
-        colors={["#a855f7", "#ec4899"]}
+        colors={["#f59e0b", "#fb923c"]}
         style={styles.pointsCard}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
-        <View style={styles.pointsOverlay}>
-          <View style={styles.pointsContent}>
-            <View style={styles.pointsLeft}>
-              <Text style={styles.pointsLabel}>Your Balance</Text>
-              <View style={styles.pointsValueRow}>
-                <Ionicons name="star" size={40} color="#fde047" />
-                <Text style={styles.pointsValue}>{currentPoints}</Text>
-              </View>
-              <Text style={styles.pointsSubtext}>
-                Keep donating to earn more rewards!
-              </Text>
-            </View>
-            <View style={styles.pointsIcon}>
-              <Ionicons
-                name="trophy"
-                size={64}
-                color="rgba(255, 255, 255, 0.3)"
-              />
-            </View>
+        <View style={styles.pointsContent}>
+          <View>
+            <Text style={styles.pointsLabel}>Your Points Balance</Text>
+            <Text style={styles.pointsValue}>{currentPoints}</Text>
+            <Text style={styles.pointsSubtext}>
+              Keep donating to earn more!
+            </Text>
+          </View>
+          <View style={styles.pointsIcon}>
+            <Ionicons name="trophy" size={48} color="#fff" />
           </View>
         </View>
-        <View style={styles.pointsCircle1} />
-        <View style={styles.pointsCircle2} />
       </LinearGradient>
 
       {/* How to Earn Points */}
       <View style={styles.earnSection}>
-        <Text style={styles.sectionTitle}>
-          <Ionicons name="trending-up" size={20} color="#a855f7" /> How to Earn
-          Points
-        </Text>
+        <Text style={styles.sectionTitle}>How to Earn Points</Text>
         <View style={styles.earnGrid}>
-          <LinearGradient
-            colors={["#a855f7", "#d946ef"]}
-            style={styles.earnCard}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          >
-            <View style={styles.earnIcon}>
-              <Ionicons name="add-circle" size={28} color="#fff" />
+          <View style={styles.earnCard}>
+            <View style={[styles.earnIcon, { backgroundColor: "#dbeafe" }]}>
+              <Ionicons name="add-circle" size={24} color="#3b82f6" />
             </View>
             <Text style={styles.earnValue}>+10</Text>
             <Text style={styles.earnLabel}>Per Donation</Text>
-          </LinearGradient>
-          <LinearGradient
-            colors={["#ec4899", "#f472b6"]}
-            style={styles.earnCard}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          >
-            <View style={styles.earnIcon}>
-              <Ionicons name="checkmark-done" size={28} color="#fff" />
+          </View>
+          <View style={styles.earnCard}>
+            <View style={[styles.earnIcon, { backgroundColor: "#dcfce7" }]}>
+              <Ionicons name="checkmark-done" size={24} color="#16a34a" />
             </View>
             <Text style={styles.earnValue}>+50</Text>
             <Text style={styles.earnLabel}>Complete Profile</Text>
-          </LinearGradient>
-          <LinearGradient
-            colors={["#d946ef", "#f0abfc"]}
-            style={styles.earnCard}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          >
-            <View style={styles.earnIcon}>
-              <Ionicons name="share-social" size={28} color="#fff" />
+          </View>
+          <View style={styles.earnCard}>
+            <View style={[styles.earnIcon, { backgroundColor: "#fef3c7" }]}>
+              <Ionicons name="share" size={24} color="#f59e0b" />
             </View>
             <Text style={styles.earnValue}>+25</Text>
-            <Text style={styles.earnLabel}>Refer Friend</Text>
-          </LinearGradient>
+            <Text style={styles.earnLabel}>Refer a Friend</Text>
+          </View>
         </View>
       </View>
 
       {/* Available Rewards */}
       <View style={styles.rewardsSection}>
-        <Text style={styles.sectionTitle}>
-          <Ionicons name="gift" size={20} color="#ec4899" /> Available Rewards
-        </Text>
+        <Text style={styles.sectionTitle}>Available Rewards</Text>
         {rewards.map((reward) => (
-          <View key={reward.id} style={styles.rewardCard}>
-            <LinearGradient
-              colors={reward.gradient}
-              style={styles.rewardIcon}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
+          <TouchableOpacity key={reward.id} style={styles.rewardCard}>
+            <View
+              style={[
+                styles.rewardIcon,
+                { backgroundColor: reward.color + "20" },
+              ]}
             >
-              <Ionicons name={reward.icon as any} size={32} color="#fff" />
-            </LinearGradient>
+              <Ionicons
+                name={reward.icon as any}
+                size={28}
+                color={reward.color}
+              />
+            </View>
             <View style={styles.rewardContent}>
               <Text style={styles.rewardTitle}>{reward.title}</Text>
               <Text style={styles.rewardDescription}>{reward.description}</Text>
               <View style={styles.rewardFooter}>
                 <View style={styles.rewardPoints}>
-                  <Ionicons name="star" size={16} color="#fbbf24" />
+                  <Ionicons name="star" size={16} color="#f59e0b" />
                   <Text style={styles.rewardPointsText}>
                     {reward.points} points
                   </Text>
@@ -259,37 +227,17 @@ export default function Rewards() {
               ]}
               disabled={currentPoints < reward.points}
             >
-              <LinearGradient
-                colors={
-                  currentPoints >= reward.points
-                    ? ["#a855f7", "#ec4899"]
-                    : ["#e9d5ff", "#fbcfe8"]
-                }
-                style={styles.redeemGradient}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
+              <Text
+                style={[
+                  styles.redeemButtonText,
+                  currentPoints < reward.points &&
+                    styles.redeemButtonTextDisabled,
+                ]}
               >
-                <Ionicons
-                  name={
-                    currentPoints >= reward.points
-                      ? "checkmark-circle"
-                      : "lock-closed"
-                  }
-                  size={18}
-                  color={currentPoints >= reward.points ? "#fff" : "#c084fc"}
-                />
-                <Text
-                  style={[
-                    styles.redeemButtonText,
-                    currentPoints < reward.points &&
-                      styles.redeemButtonTextDisabled,
-                  ]}
-                >
-                  {currentPoints >= reward.points ? "Redeem" : "Locked"}
-                </Text>
-              </LinearGradient>
+                {currentPoints >= reward.points ? "Redeem" : "Locked"}
+              </Text>
             </TouchableOpacity>
-          </View>
+          </TouchableOpacity>
         ))}
       </View>
     </View>
@@ -298,15 +246,8 @@ export default function Rewards() {
   const renderAchievementsTab = () => (
     <View style={styles.tabContent}>
       {/* Progress Overview */}
-      <LinearGradient
-        colors={["#a855f7", "#ec4899"]}
-        style={styles.progressOverview}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-      >
-        <Text style={styles.overviewTitle}>
-          <Ionicons name="trophy" size={20} color="#fff" /> Your Progress
-        </Text>
+      <View style={styles.progressOverview}>
+        <Text style={styles.overviewTitle}>Your Progress</Text>
         <View style={styles.overviewStats}>
           <View style={styles.overviewStat}>
             <Text style={styles.overviewValue}>
@@ -322,13 +263,11 @@ export default function Rewards() {
             <Text style={styles.overviewLabel}>In Progress</Text>
           </View>
         </View>
-      </LinearGradient>
+      </View>
 
       {/* Achievements List */}
       <View style={styles.achievementsSection}>
-        <Text style={styles.sectionTitle}>
-          <Ionicons name="medal" size={20} color="#d946ef" /> Achievements
-        </Text>
+        <Text style={styles.sectionTitle}>Achievements</Text>
         {achievements.map((achievement) => (
           <View
             key={achievement.id}
@@ -337,27 +276,20 @@ export default function Rewards() {
               achievement.unlocked && styles.achievementCardUnlocked,
             ]}
           >
-            <LinearGradient
-              colors={
-                achievement.unlocked
-                  ? achievement.gradient
-                  : ["#fae8ff", "#fce7f3"]
-              }
-              style={styles.achievementIcon}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
+            <View
+              style={[
+                styles.achievementIcon,
+                {
+                  backgroundColor: achievement.unlocked ? "#dcfce7" : "#f3f4f6",
+                },
+              ]}
             >
               <Ionicons
                 name={achievement.icon as any}
-                size={36}
-                color={achievement.unlocked ? "#fff" : "#d8b4fe"}
+                size={32}
+                color={achievement.unlocked ? "#16a34a" : "#9ca3af"}
               />
-              {achievement.unlocked && (
-                <View style={styles.achievementBadge}>
-                  <Ionicons name="checkmark" size={14} color="#fde047" />
-                </View>
-              )}
-            </LinearGradient>
+            </View>
             <View style={styles.achievementContent}>
               <View style={styles.achievementHeader}>
                 <Text
@@ -369,9 +301,7 @@ export default function Rewards() {
                   {achievement.title}
                 </Text>
                 {achievement.unlocked && (
-                  <View style={styles.unlockedBadge}>
-                    <Text style={styles.unlockedText}>Unlocked</Text>
-                  </View>
+                  <Ionicons name="checkmark-circle" size={20} color="#16a34a" />
                 )}
               </View>
               <Text style={styles.achievementDescription}>
@@ -380,8 +310,7 @@ export default function Rewards() {
               {!achievement.unlocked && (
                 <View style={styles.progressContainer}>
                   <View style={styles.progressBar}>
-                    <LinearGradient
-                      colors={achievement.gradient}
+                    <View
                       style={[
                         styles.progressFill,
                         {
@@ -390,8 +319,6 @@ export default function Rewards() {
                           }%`,
                         },
                       ]}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 0 }}
                     />
                   </View>
                   <Text style={styles.progressText}>
@@ -408,33 +335,24 @@ export default function Rewards() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <LinearGradient
-        colors={["#fae8ff", "#fce7f3", "#fff"]}
-        style={StyleSheet.absoluteFill}
-      />
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <LinearGradient
-          colors={["#a855f7", "#ec4899"]}
+        <ImageBackground
+          source={require("../../assets/images/dish2.jpeg")}
           style={styles.header}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
+          imageStyle={styles.headerImage}
         >
+          <View style={styles.overlay} />
           <View style={styles.headerContent}>
-            <View style={styles.headerIcon}>
-              <Ionicons name="star" size={36} color="#fff" />
-            </View>
-            <Text style={styles.headerTitle}>Rewards Hub</Text>
+            <Text style={styles.headerTitle}>Rewards & Achievements</Text>
             <Text style={styles.headerSubtitle}>
-              Track your impact and claim amazing rewards
+              Track your impact and redeem rewards
             </Text>
           </View>
-          <View style={styles.headerCircle1} />
-          <View style={styles.headerCircle2} />
-        </LinearGradient>
+        </ImageBackground>
 
         {/* Tabs */}
         <View style={styles.tabs}>
@@ -442,19 +360,6 @@ export default function Rewards() {
             style={[styles.tab, selectedTab === "rewards" && styles.tabActive]}
             onPress={() => setSelectedTab("rewards")}
           >
-            {selectedTab === "rewards" && (
-              <LinearGradient
-                colors={["#a855f7", "#ec4899"]}
-                style={StyleSheet.absoluteFill}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-              />
-            )}
-            <Ionicons
-              name="gift"
-              size={20}
-              color={selectedTab === "rewards" ? "#fff" : "#a855f7"}
-            />
             <Text
               style={[
                 styles.tabText,
@@ -471,19 +376,6 @@ export default function Rewards() {
             ]}
             onPress={() => setSelectedTab("achievements")}
           >
-            {selectedTab === "achievements" && (
-              <LinearGradient
-                colors={["#a855f7", "#ec4899"]}
-                style={StyleSheet.absoluteFill}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-              />
-            )}
-            <Ionicons
-              name="trophy"
-              size={20}
-              color={selectedTab === "achievements" ? "#fff" : "#ec4899"}
-            />
             <Text
               style={[
                 styles.tabText,
@@ -507,167 +399,123 @@ export default function Rewards() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#f9fafb",
   },
   scrollView: {
     flex: 1,
   },
   header: {
-    padding: 32,
+    padding: 24,
     paddingTop: 48,
-    borderBottomLeftRadius: 32,
-    borderBottomRightRadius: 32,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
     overflow: "hidden",
-    position: "relative",
+  },
+  headerImage: {
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+  },
+  overlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
   },
   headerContent: {
-    alignItems: "center",
+    position: "relative",
     zIndex: 1,
   },
-  headerIcon: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: "rgba(255, 255, 255, 0.25)",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 16,
-  },
   headerTitle: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: "bold",
     color: "#fff",
     marginBottom: 8,
   },
   headerSubtitle: {
-    fontSize: 15,
+    fontSize: 14,
     color: "#fff",
-    opacity: 0.95,
-    textAlign: "center",
-  },
-  headerCircle1: {
-    position: "absolute",
-    top: -50,
-    right: -50,
-    width: 180,
-    height: 180,
-    borderRadius: 90,
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
-  },
-  headerCircle2: {
-    position: "absolute",
-    bottom: -40,
-    left: -40,
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    opacity: 0.9,
   },
   tabs: {
     flexDirection: "row",
-    backgroundColor: "#faf5ff",
-    margin: 20,
-    borderRadius: 20,
-    padding: 6,
-    borderWidth: 2,
-    borderColor: "#e9d5ff",
+    backgroundColor: "#fff",
+    margin: 16,
+    borderRadius: 12,
+    padding: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   tab: {
     flex: 1,
-    flexDirection: "row",
+    paddingVertical: 12,
+    borderRadius: 8,
     alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 14,
-    borderRadius: 16,
-    gap: 8,
-    overflow: "hidden",
   },
-  tabActive: {},
+  tabActive: {
+    backgroundColor: "#16a34a",
+  },
   tabText: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: "#a855f7",
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#6b7280",
   },
   tabTextActive: {
     color: "#fff",
   },
   tabContent: {
-    padding: 20,
-    paddingTop: 0,
+    padding: 16,
   },
   pointsCard: {
-    borderRadius: 28,
-    padding: 28,
-    marginBottom: 28,
-    shadowColor: "#a855f7",
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.4,
-    shadowRadius: 20,
-    elevation: 12,
-    overflow: "hidden",
-    position: "relative",
-  },
-  pointsOverlay: {
-    zIndex: 1,
+    borderRadius: 20,
+    padding: 24,
+    marginBottom: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 6,
   },
   pointsContent: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
-  pointsLeft: {
-    flex: 1,
-  },
   pointsLabel: {
-    fontSize: 15,
-    color: "#fff",
-    opacity: 0.95,
-    marginBottom: 12,
-    fontWeight: "600",
-  },
-  pointsValueRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    marginBottom: 12,
-  },
-  pointsValue: {
-    fontSize: 56,
-    fontWeight: "bold",
-    color: "#fff",
-  },
-  pointsSubtext: {
     fontSize: 14,
     color: "#fff",
     opacity: 0.9,
+    marginBottom: 8,
+  },
+  pointsValue: {
+    fontSize: 48,
+    fontWeight: "bold",
+    color: "#fff",
+    marginBottom: 4,
+  },
+  pointsSubtext: {
+    fontSize: 13,
+    color: "#fff",
+    opacity: 0.8,
   },
   pointsIcon: {
-    marginLeft: 20,
-  },
-  pointsCircle1: {
-    position: "absolute",
-    top: -40,
-    right: -40,
-    width: 160,
-    height: 160,
-    borderRadius: 80,
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
-  },
-  pointsCircle2: {
-    position: "absolute",
-    bottom: -50,
-    left: -30,
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    borderRadius: 40,
+    padding: 16,
   },
   earnSection: {
-    marginBottom: 32,
+    marginBottom: 24,
   },
   sectionTitle: {
-    fontSize: 19,
+    fontSize: 18,
     fontWeight: "bold",
-    color: "#7e22ce",
+    color: "#1f2937",
     marginBottom: 16,
   },
   earnGrid: {
@@ -676,81 +524,72 @@ const styles = StyleSheet.create({
   },
   earnCard: {
     flex: 1,
-    borderRadius: 20,
-    padding: 20,
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    padding: 16,
     alignItems: "center",
-    shadowColor: "#a855f7",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   earnIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: "rgba(255, 255, 255, 0.25)",
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 12,
   },
   earnValue: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: "bold",
-    color: "#fff",
+    color: "#1f2937",
     marginBottom: 4,
   },
   earnLabel: {
-    fontSize: 12,
-    color: "#fff",
+    fontSize: 11,
+    color: "#6b7280",
     textAlign: "center",
-    opacity: 0.95,
-    fontWeight: "600",
   },
   rewardsSection: {
-    marginBottom: 32,
+    marginBottom: 24,
   },
   rewardCard: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#fff",
-    borderRadius: 24,
-    padding: 18,
-    marginBottom: 16,
-    shadowColor: "#a855f7",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 8,
-    borderWidth: 2,
-    borderColor: "#fae8ff",
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   rewardIcon: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 16,
-    shadowColor: "#a855f7",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
+    marginRight: 12,
   },
   rewardContent: {
     flex: 1,
   },
   rewardTitle: {
-    fontSize: 17,
-    fontWeight: "700",
-    color: "#7e22ce",
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#1f2937",
     marginBottom: 4,
   },
   rewardDescription: {
     fontSize: 13,
-    color: "#a855f7",
-    marginBottom: 10,
+    color: "#6b7280",
+    marginBottom: 8,
   },
   rewardFooter: {
     flexDirection: "row",
@@ -760,54 +599,51 @@ const styles = StyleSheet.create({
   rewardPoints: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
+    gap: 4,
   },
   rewardPointsText: {
-    fontSize: 14,
-    fontWeight: "700",
+    fontSize: 13,
+    fontWeight: "600",
     color: "#f59e0b",
   },
   rewardCategory: {
     fontSize: 11,
-    color: "#c084fc",
-    fontWeight: "600",
+    color: "#9ca3af",
   },
   redeemButton: {
-    marginLeft: 12,
-    borderRadius: 16,
-    overflow: "hidden",
-  },
-  redeemGradient: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
+    backgroundColor: "#16a34a",
     paddingHorizontal: 16,
-    paddingVertical: 10,
+    paddingVertical: 8,
+    borderRadius: 8,
+    marginLeft: 12,
   },
-  redeemButtonDisabled: {},
+  redeemButtonDisabled: {
+    backgroundColor: "#e5e7eb",
+  },
   redeemButtonText: {
-    fontSize: 14,
-    fontWeight: "700",
+    fontSize: 13,
+    fontWeight: "600",
     color: "#fff",
   },
   redeemButtonTextDisabled: {
-    color: "#c084fc",
+    color: "#9ca3af",
   },
   progressOverview: {
-    borderRadius: 24,
-    padding: 24,
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    padding: 20,
     marginBottom: 24,
-    shadowColor: "#a855f7",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 16,
-    elevation: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   overviewTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#fff",
-    marginBottom: 20,
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#1f2937",
+    marginBottom: 16,
   },
   overviewStats: {
     flexDirection: "row",
@@ -818,71 +654,48 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   overviewValue: {
-    fontSize: 40,
+    fontSize: 32,
     fontWeight: "bold",
-    color: "#fff",
-    marginBottom: 8,
+    color: "#16a34a",
+    marginBottom: 4,
   },
   overviewLabel: {
-    fontSize: 14,
-    color: "#fff",
-    opacity: 0.95,
-    fontWeight: "600",
+    fontSize: 13,
+    color: "#6b7280",
   },
   overviewDivider: {
-    width: 2,
-    height: 50,
-    backgroundColor: "rgba(255, 255, 255, 0.3)",
+    width: 1,
+    height: 40,
+    backgroundColor: "#e5e7eb",
   },
   achievementsSection: {
-    marginBottom: 32,
+    marginBottom: 24,
   },
   achievementCard: {
     flexDirection: "row",
     backgroundColor: "#fff",
-    borderRadius: 24,
-    padding: 18,
-    marginBottom: 16,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
     opacity: 0.6,
-    shadowColor: "#a855f7",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 6,
-    borderWidth: 2,
-    borderColor: "#fae8ff",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   achievementCardUnlocked: {
     opacity: 1,
-    borderColor: "#e9d5ff",
-    backgroundColor: "#faf5ff",
+    borderWidth: 2,
+    borderColor: "#dcfce7",
   },
   achievementIcon: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 16,
-    position: "relative",
-    shadowColor: "#a855f7",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
-  },
-  achievementBadge: {
-    position: "absolute",
-    top: -4,
-    right: -4,
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: "#7e22ce",
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 3,
-    borderColor: "#fff",
   },
   achievementContent: {
     flex: 1,
@@ -891,32 +704,20 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 6,
+    marginBottom: 4,
   },
   achievementTitle: {
-    fontSize: 17,
-    fontWeight: "700",
-    color: "#d8b4fe",
-    flex: 1,
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#6b7280",
   },
   achievementTitleUnlocked: {
-    color: "#7e22ce",
-  },
-  unlockedBadge: {
-    backgroundColor: "#dcfce7",
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  unlockedText: {
-    fontSize: 11,
-    fontWeight: "700",
-    color: "#15803d",
+    color: "#1f2937",
   },
   achievementDescription: {
     fontSize: 13,
-    color: "#c084fc",
-    marginBottom: 14,
+    color: "#9ca3af",
+    marginBottom: 12,
   },
   progressContainer: {
     flexDirection: "row",
@@ -925,18 +726,19 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     flex: 1,
-    height: 10,
-    backgroundColor: "#fae8ff",
-    borderRadius: 5,
+    height: 8,
+    backgroundColor: "#f3f4f6",
+    borderRadius: 4,
     overflow: "hidden",
   },
   progressFill: {
     height: "100%",
-    borderRadius: 5,
+    backgroundColor: "#16a34a",
+    borderRadius: 4,
   },
   progressText: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: "#a855f7",
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#6b7280",
   },
 });
