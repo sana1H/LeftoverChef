@@ -1,3 +1,6 @@
+// // app/(tabs)/History.tsx - Prediction History Screen
+// You can replace Alerts.tsx with this or create a new tab
+
 import React, { useState } from "react";
 import {
   View,
