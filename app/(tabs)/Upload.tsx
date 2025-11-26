@@ -1,4 +1,3 @@
-// // app/(tabs)/Upload.tsx - Complete Upload Screen with Image Picker
 import React, { useState } from "react";
 import {
   View,
@@ -13,116 +12,109 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
-import * as ImagePicker from 'expo-image-picker';
-import { mlAPI } from '@/lib/api';
-import { useRouter } from 'expo-router';
+import * as ImagePicker from "expo-image-picker";
+import * as Camera from "expo-camera";
+import { useRouter } from "expo-router";
 
 interface Prediction {
-  name: string;
-  confidence: number;
+  freshness: "Fresh" | "Stale";
+  confidence: number; // 0–1
 }
 
 export default function Upload() {
   const router = useRouter();
+
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [predictions, setPredictions] = useState<Prediction[]>([]);
+  const [prediction, setPrediction] = useState<Prediction | null>(null);
   const [showResults, setShowResults] = useState(false);
 
-  // Request permissions
-  const requestPermissions = async () => {
+  // Permission for camera
+  const requestCameraPermission = async () => {
+    try {
+      const { status } = await Camera.requestCameraPermissionsAsync();
+      return status === "granted";
+    } catch {
+      return false;
+    }
+  };
+
+  // Permission for gallery
+  const requestGalleryPermission = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert(
-        'Permission Required',
-        'Sorry, we need camera roll permissions to make this work!'
-      );
+    if (status !== "granted") {
+      Alert.alert("Permission Required", "Gallery access is needed.");
       return false;
     }
     return true;
   };
 
-  // Pick image from gallery
-  const pickImage = async () => {
-    const hasPermission = await requestPermissions();
-    if (!hasPermission) return;
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 0.8,
-    });
-
-    if (!result.canceled && result.assets[0]) {
-      setSelectedImage(result.assets[0].uri);
-      setShowResults(false);
-      setPredictions([]);
-    }
-  };
-
-  // Take photo with camera
+  // Take a photo
   const takePhoto = async () => {
-    const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert(
-        'Permission Required',
-        'Sorry, we need camera permissions to make this work!'
-      );
+    const hasPermission = await requestCameraPermission();
+    if (!hasPermission) {
+      Alert.alert("Permission Required", "Camera access is needed.");
       return;
     }
 
     const result = await ImagePicker.launchCameraAsync({
       allowsEditing: true,
-      aspect: [4, 3],
       quality: 0.8,
     });
 
     if (!result.canceled && result.assets[0]) {
       setSelectedImage(result.assets[0].uri);
+      setPrediction(null);
       setShowResults(false);
-      setPredictions([]);
     }
   };
 
-  // Upload and predict
+  // Pick from gallery
+  const pickImage = async () => {
+    const hasPermission = await requestGalleryPermission();
+    if (!hasPermission) return;
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      quality: 0.8,
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      setSelectedImage(result.assets[0].uri);
+      setPrediction(null);
+      setShowResults(false);
+    }
+  };
+
+  // Upload & check freshness
   const handleUpload = async () => {
     if (!selectedImage) {
-      Alert.alert('No Image', 'Please select an image first');
+      Alert.alert("No Image", "Please upload a food image first.");
       return;
     }
 
     setIsUploading(true);
 
     try {
-      const response = await mlAPI.predict(selectedImage);
-      
-      if (response.success && response.data) {
-        setPredictions(response.data.predictions);
-        setShowResults(true);
-        
-        Alert.alert(
-          'Success!',
-          `Detected ${response.data.predictions.length} ingredients`,
-          [
-            {
-              text: 'OK',
-              onPress: () => console.log('Success acknowledged'),
-            },
-          ]
-        );
-      }
-    } catch (error: any) {
-      console.error('Upload error:', error);
+      // Simulate actual ML API delay
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      // MOCK – Your ML model will return real values later.
+      const mock: Prediction =
+        Math.random() > 0.5
+          ? { freshness: "Fresh", confidence: 0.92 }
+          : { freshness: "Stale", confidence: 0.81 };
+
+      setPrediction(mock);
+      setShowResults(true);
+
       Alert.alert(
-        'Upload Failed',
-        error.message || 'Something went wrong. Please try again.',
-        [
-          {
-            text: 'OK',
-          },
-        ]
+        "Analysis Complete",
+        `Food is detected as: ${mock.freshness}`,
+        [{ text: "OK" }]
       );
+    } catch {
+      Alert.alert("Error", "Unable to analyze image. Try again.");
     } finally {
       setIsUploading(false);
     }
@@ -131,7 +123,7 @@ export default function Upload() {
   // Reset
   const handleReset = () => {
     setSelectedImage(null);
-    setPredictions([]);
+    setPrediction(null);
     setShowResults(false);
   };
 
@@ -141,12 +133,9 @@ export default function Upload() {
         colors={["#fae8ff", "#fce7f3", "#fff"]}
         style={StyleSheet.absoluteFill}
       />
-      
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Header */}
+
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {/* HEADER */}
         <LinearGradient
           colors={["#a855f7", "#ec4899"]}
           style={styles.header}
@@ -155,43 +144,41 @@ export default function Upload() {
         >
           <View style={styles.headerContent}>
             <View style={styles.headerIcon}>
-              <Ionicons name="camera" size={32} color="#fff" />
+              <Ionicons name="restaurant" size={32} color="#fff" />
             </View>
-            <Text style={styles.headerTitle}>Upload Food Image</Text>
+
+            <Text style={styles.headerTitle}>Food Freshness Check</Text>
             <Text style={styles.headerSubtitle}>
-              Identify ingredients with AI
+              Upload food image to check if it is fresh or stale
             </Text>
           </View>
-          <View style={styles.decorativeCircle1} />
-          <View style={styles.decorativeCircle2} />
         </LinearGradient>
 
         <View style={styles.content}>
-          {/* Image Preview or Upload Options */}
+          {/* Upload Section */}
           {!selectedImage ? (
-            <View style={styles.uploadSection}>
+            <>
               <View style={styles.uploadCard}>
                 <LinearGradient
                   colors={["#fae8ff", "#fce7f3"]}
                   style={styles.uploadArea}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
                 >
-                  <Ionicons name="cloud-upload-outline" size={64} color="#d8b4fe" />
+                  <Ionicons
+                    name="cloud-upload-outline"
+                    size={64}
+                    color="#d8b4fe"
+                  />
                   <Text style={styles.uploadTitle}>Upload Food Image</Text>
                   <Text style={styles.uploadSubtitle}>
-                    Take a photo or choose from gallery
+                    Detect freshness using AI
                   </Text>
                 </LinearGradient>
               </View>
 
-              {/* Upload Buttons */}
               <TouchableOpacity style={styles.actionButton} onPress={takePhoto}>
                 <LinearGradient
                   colors={["#a855f7", "#ec4899"]}
                   style={styles.actionGradient}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
                 >
                   <Ionicons name="camera" size={24} color="#fff" />
                   <Text style={styles.actionText}>Take Photo</Text>
@@ -202,26 +189,21 @@ export default function Upload() {
                 <LinearGradient
                   colors={["#ec4899", "#f472b6"]}
                   style={styles.actionGradient}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
                 >
                   <Ionicons name="images" size={24} color="#fff" />
                   <Text style={styles.actionText}>Choose from Gallery</Text>
                 </LinearGradient>
               </TouchableOpacity>
-            </View>
+            </>
           ) : (
             <View style={styles.previewSection}>
-              {/* Image Preview */}
               <View style={styles.imageCard}>
                 <Image
                   source={{ uri: selectedImage }}
                   style={styles.previewImage}
-                  resizeMode="cover"
                 />
               </View>
 
-              {/* Action Buttons */}
               <View style={styles.buttonRow}>
                 <TouchableOpacity
                   style={styles.secondaryButton}
@@ -233,15 +215,13 @@ export default function Upload() {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  style={[styles.primaryButton, { flex: 1 }]}
+                  style={styles.primaryButton}
                   onPress={handleUpload}
                   disabled={isUploading}
                 >
                   <LinearGradient
                     colors={["#a855f7", "#ec4899"]}
                     style={styles.gradientButton}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}
                   >
                     {isUploading ? (
                       <>
@@ -251,61 +231,65 @@ export default function Upload() {
                     ) : (
                       <>
                         <Ionicons name="sparkles" size={24} color="#fff" />
-                        <Text style={styles.buttonText}>Analyze Image</Text>
+                        <Text style={styles.buttonText}>Check Freshness</Text>
                       </>
                     )}
                   </LinearGradient>
                 </TouchableOpacity>
               </View>
 
-              {/* Results */}
-              {showResults && predictions.length > 0 && (
+              {/* RESULTS */}
+              {showResults && prediction && (
                 <View style={styles.resultsCard}>
                   <View style={styles.resultsHeader}>
-                    <Ionicons name="checkmark-circle" size={24} color="#16a34a" />
-                    <Text style={styles.resultsTitle}>
-                      Detected Ingredients ({predictions.length})
+                    <Ionicons
+                      name={
+                        prediction.freshness === "Fresh"
+                          ? "checkmark-circle"
+                          : "warning"
+                      }
+                      size={26}
+                      color={
+                        prediction.freshness === "Fresh" ? "#16a34a" : "#dc2626"
+                      }
+                    />
+
+                    <Text
+                      style={[
+                        styles.resultsTitle,
+                        {
+                          color:
+                            prediction.freshness === "Fresh"
+                              ? "#16a34a"
+                              : "#dc2626",
+                        },
+                      ]}
+                    >
+                      Food is {prediction.freshness}
                     </Text>
                   </View>
 
-                  {predictions.map((pred, index) => (
-                    <View key={index} style={styles.predictionItem}>
-                      <View style={styles.predictionInfo}>
-                        <View style={styles.predictionIcon}>
-                          <Ionicons name="nutrition" size={20} color="#a855f7" />
-                        </View>
-                        <Text style={styles.predictionName}>
-                          {pred.name.charAt(0).toUpperCase() + pred.name.slice(1)}
-                        </Text>
-                      </View>
-                      
-                      <View style={styles.confidenceContainer}>
-                        <View style={styles.confidenceBar}>
-                          <LinearGradient
-                            colors={["#a855f7", "#ec4899"]}
-                            style={[
-                              styles.confidenceFill,
-                              { width: `${pred.confidence * 100}%` },
-                            ]}
-                            start={{ x: 0, y: 0 }}
-                            end={{ x: 1, y: 0 }}
-                          />
-                        </View>
-                        <Text style={styles.confidenceText}>
-                          {Math.round(pred.confidence * 100)}%
-                        </Text>
-                      </View>
-                    </View>
-                  ))}
+                  <View style={styles.confidenceContainer}>
+                    <Text style={styles.confidenceLabel}>Confidence:</Text>
 
-                  {/* View History Button */}
-                  <TouchableOpacity
-                    style={styles.historyButton}
-                    onPress={() => router.push('/(tabs)/Alerts')}
-                  >
-                    <Ionicons name="time" size={18} color="#a855f7" />
-                    <Text style={styles.historyButtonText}>View History</Text>
-                  </TouchableOpacity>
+                    <View style={styles.confidenceBar}>
+                      <LinearGradient
+                        colors={
+                          prediction.freshness === "Fresh"
+                            ? ["#22c55e", "#16a34a"]
+                            : ["#f87171", "#dc2626"]
+                        }
+                        style={[
+                          styles.confidenceFill,
+                          { width: `${prediction.confidence * 100}%` },
+                        ]}
+                      />
+                    </View>
+
+                    <Text style={styles.confidenceText}>
+                      {(prediction.confidence * 100).toFixed(0)}%
+                    </Text>
+                  </View>
                 </View>
               )}
             </View>
@@ -315,24 +299,27 @@ export default function Upload() {
           <View style={styles.infoCard}>
             <View style={styles.infoHeader}>
               <Ionicons name="information-circle" size={20} color="#a855f7" />
-              <Text style={styles.infoTitle}>How it works</Text>
+              <Text style={styles.infoTitle}>How It Works</Text>
             </View>
+
             <View style={styles.infoItem}>
               <Text style={styles.infoNumber}>1</Text>
               <Text style={styles.infoText}>
-                Take a photo or upload an image of your food
+                Upload a clear image of the food item
               </Text>
             </View>
+
             <View style={styles.infoItem}>
               <Text style={styles.infoNumber}>2</Text>
               <Text style={styles.infoText}>
-                Our AI analyzes and identifies ingredients
+                Our ML model analyzes color, texture & patterns
               </Text>
             </View>
+
             <View style={styles.infoItem}>
               <Text style={styles.infoNumber}>3</Text>
               <Text style={styles.infoText}>
-                Get instant results with confidence scores
+                You get a prediction whether food is **fresh or stale**
               </Text>
             </View>
           </View>
@@ -342,110 +329,82 @@ export default function Upload() {
   );
 }
 
+// STYLES
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  scrollView: {
-    flex: 1,
-  },
+  container: { flex: 1 },
+
   header: {
     padding: 32,
     paddingTop: 48,
     borderBottomLeftRadius: 32,
     borderBottomRightRadius: 32,
-    overflow: "hidden",
-    position: "relative",
   },
-  headerContent: {
-    alignItems: "center",
-    zIndex: 1,
-  },
+
+  headerContent: { alignItems: "center" },
+
   headerIcon: {
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: "rgba(255, 255, 255, 0.25)",
+    backgroundColor: "rgba(255,255,255,0.25)",
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 16,
   },
+
   headerTitle: {
     fontSize: 28,
     fontWeight: "bold",
     color: "#fff",
-    marginBottom: 8,
   },
+
   headerSubtitle: {
     fontSize: 16,
     color: "#fff",
-    opacity: 0.95,
+    marginTop: 6,
+    opacity: 0.9,
+    textAlign: "center",
+    paddingHorizontal: 10,
   },
-  decorativeCircle1: {
-    position: "absolute",
-    top: -40,
-    right: -40,
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
-  },
-  decorativeCircle2: {
-    position: "absolute",
-    bottom: -60,
-    left: -30,
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
-  },
+
   content: {
     padding: 20,
   },
-  uploadSection: {
-    marginBottom: 24,
-  },
+
   uploadCard: {
     borderRadius: 24,
     overflow: "hidden",
     marginBottom: 20,
-    shadowColor: "#a855f7",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
-    shadowRadius: 16,
-    elevation: 8,
   },
+
   uploadArea: {
     padding: 48,
     alignItems: "center",
-    justifyContent: "center",
     borderWidth: 3,
     borderColor: "#e9d5ff",
     borderStyle: "dashed",
     borderRadius: 24,
   },
+
   uploadTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
+    fontSize: 22,
+    fontWeight: "700",
     color: "#7e22ce",
     marginTop: 16,
-    marginBottom: 8,
   },
+
   uploadSubtitle: {
     fontSize: 14,
     color: "#a855f7",
-    textAlign: "center",
+    marginTop: 4,
   },
+
   actionButton: {
     borderRadius: 16,
     overflow: "hidden",
     marginBottom: 16,
-    shadowColor: "#a855f7",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 16,
-    elevation: 8,
   },
+
   actionGradient: {
     flexDirection: "row",
     alignItems: "center",
@@ -453,201 +412,170 @@ const styles = StyleSheet.create({
     padding: 18,
     gap: 12,
   },
+
   actionText: {
     fontSize: 17,
-    fontWeight: "700",
     color: "#fff",
+    fontWeight: "700",
   },
+
   previewSection: {
     marginBottom: 24,
   },
+
   imageCard: {
     borderRadius: 24,
     overflow: "hidden",
     marginBottom: 20,
-    shadowColor: "#a855f7",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
-    shadowRadius: 16,
-    elevation: 8,
     backgroundColor: "#fff",
+    elevation: 8,
   },
+
   previewImage: {
     width: "100%",
     height: 300,
   },
+
   buttonRow: {
     flexDirection: "row",
     gap: 16,
     marginBottom: 24,
   },
+
   secondaryButton: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 16,
-    paddingHorizontal: 24,
+    padding: 16,
     borderRadius: 16,
-    borderWidth: 3,
+    borderWidth: 2,
     borderColor: "#e9d5ff",
     backgroundColor: "#faf5ff",
     gap: 8,
+    flex: 1,
+    justifyContent: "center",
   },
+
   secondaryButtonText: {
     fontSize: 16,
-    fontWeight: "700",
     color: "#a855f7",
+    fontWeight: "700",
   },
+
   primaryButton: {
     borderRadius: 16,
     overflow: "hidden",
-    shadowColor: "#a855f7",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 16,
-    elevation: 8,
+    flex: 1,
   },
+
   gradientButton: {
+    padding: 18,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    padding: 18,
     gap: 12,
   },
+
   buttonText: {
     fontSize: 17,
-    fontWeight: "700",
     color: "#fff",
+    fontWeight: "700",
   },
+
+  // RESULTS SECTION
   resultsCard: {
     backgroundColor: "#fff",
-    borderRadius: 24,
-    padding: 24,
-    shadowColor: "#a855f7",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
-    shadowRadius: 16,
-    elevation: 8,
+    padding: 22,
+    borderRadius: 20,
+    elevation: 7,
+    marginBottom: 16,
     borderWidth: 2,
-    borderColor: "#dcfce7",
+    borderColor: "#f3e8ff",
   },
+
   resultsHeader: {
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
-    marginBottom: 20,
+    marginBottom: 18,
   },
+
   resultsTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "bold",
-    color: "#16a34a",
   },
-  predictionItem: {
-    marginBottom: 16,
-    paddingBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#fae8ff",
-  },
-  predictionInfo: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    marginBottom: 12,
-  },
-  predictionIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: "#fae8ff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  predictionName: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#7e22ce",
-  },
+
   confidenceContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
+    marginTop: 8,
   },
+
+  confidenceLabel: {
+    fontSize: 16,
+    color: "#6b7280",
+    marginBottom: 6,
+  },
+
   confidenceBar: {
-    flex: 1,
-    height: 8,
-    backgroundColor: "#fae8ff",
-    borderRadius: 4,
+    height: 10,
+    backgroundColor: "#f3e8ff",
+    borderRadius: 6,
     overflow: "hidden",
   },
+
   confidenceFill: {
     height: "100%",
-    borderRadius: 4,
+    borderRadius: 6,
   },
+
   confidenceText: {
-    fontSize: 14,
+    marginTop: 6,
+    fontSize: 16,
     fontWeight: "700",
-    color: "#a855f7",
-    minWidth: 45,
     textAlign: "right",
+    color: "#7e22ce",
   },
-  historyButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-    backgroundColor: "#fae8ff",
-    marginTop: 12,
-  },
-  historyButtonText: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: "#a855f7",
-  },
+
   infoCard: {
+    marginTop: 20,
     backgroundColor: "#fff",
-    borderRadius: 20,
     padding: 20,
-    shadowColor: "#a855f7",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
+    borderRadius: 20,
     elevation: 6,
   },
+
   infoHeader: {
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-    marginBottom: 16,
-  },
-  infoTitle: {
-    fontSize: 17,
-    fontWeight: "bold",
-    color: "#7e22ce",
-  },
-  infoItem: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 12,
     marginBottom: 12,
   },
+
+  infoTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#7e22ce",
+  },
+
+  infoItem: {
+    flexDirection: "row",
+    gap: 12,
+    marginBottom: 10,
+    alignItems: "flex-start",
+  },
+
   infoNumber: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
     backgroundColor: "#a855f7",
     color: "#fff",
-    fontSize: 14,
-    fontWeight: "bold",
     textAlign: "center",
-    lineHeight: 28,
+    lineHeight: 26,
+    fontWeight: "700",
   },
+
   infoText: {
     flex: 1,
+    color: "#7e22ce",
     fontSize: 14,
-    color: "#a855f7",
-    lineHeight: 20,
   },
 });

@@ -2,7 +2,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Change this to your backend URL
-const API_BASE_URL = "http://localhost:8000/api";
+
+const API_BASE_URL =
+  process.env.EXPO_PUBLIC_API_URL || "http://localhost:8000/api";
+//const API_BASE_URL = "http://localhost:8000/api";
 // For Android emulator use: 'http://10.0.2.2:8000/api'
 // For iOS simulator use: 'http://localhost:8000/api'
 // For physical device use: 'http://YOUR_LOCAL_IP:8000/api'
@@ -204,3 +207,6 @@ export const getImageUrl = (imagePath: string) => {
 };
 
 export { API_BASE_URL };
+
+
+// ... rest of your api.ts code remains the same

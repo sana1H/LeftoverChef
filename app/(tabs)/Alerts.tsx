@@ -1,6 +1,3 @@
-// // app/(tabs)/History.tsx - Prediction History Screen
-// You can replace Alerts.tsx with this or create a new tab
-
 import React, { useState } from "react";
 import {
   View,
@@ -326,56 +323,6 @@ export default function Alerts() {
             ))
           )}
         </View>
-
-        {/* Quick Actions */}
-        <View style={styles.quickActions}>
-          <Text style={styles.quickActionsTitle}>
-            <Ionicons name="flash" size={20} color="#a855f7" /> Quick Actions
-          </Text>
-          <TouchableOpacity style={styles.actionCard}>
-            <LinearGradient
-              colors={["#a855f7", "#ec4899"]}
-              style={styles.actionGradient}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-            >
-              <View style={styles.actionContent}>
-                <View style={styles.actionIcon}>
-                  <Ionicons name="add-circle" size={28} color="#fff" />
-                </View>
-                <View style={styles.actionText}>
-                  <Text style={styles.actionTitle}>Create New Donation</Text>
-                  <Text style={styles.actionSubtitle}>
-                    Share your surplus food
-                  </Text>
-                </View>
-              </View>
-              <Ionicons name="arrow-forward-circle" size={28} color="#fff" />
-            </LinearGradient>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.actionCard}>
-            <LinearGradient
-              colors={["#ec4899", "#f472b6"]}
-              style={styles.actionGradient}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-            >
-              <View style={styles.actionContent}>
-                <View style={styles.actionIcon}>
-                  <Ionicons name="gift" size={28} color="#fff" />
-                </View>
-                <View style={styles.actionText}>
-                  <Text style={styles.actionTitle}>View Rewards</Text>
-                  <Text style={styles.actionSubtitle}>
-                    Check your earned points
-                  </Text>
-                </View>
-              </View>
-              <Ionicons name="arrow-forward-circle" size={28} color="#fff" />
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -655,59 +602,5 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: "#c084fc",
     textAlign: "center",
-  },
-  quickActions: {
-    padding: 20,
-    paddingTop: 0,
-  },
-  quickActionsTitle: {
-    fontSize: 19,
-    fontWeight: "bold",
-    color: "#7e22ce",
-    marginBottom: 16,
-  },
-  actionCard: {
-    borderRadius: 20,
-    marginBottom: 16,
-    overflow: "hidden",
-    shadowColor: "#a855f7",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 16,
-    elevation: 8,
-  },
-  actionGradient: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: 20,
-  },
-  actionContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    flex: 1,
-  },
-  actionIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: "rgba(255, 255, 255, 0.25)",
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 16,
-  },
-  actionText: {
-    flex: 1,
-  },
-  actionTitle: {
-    fontSize: 17,
-    fontWeight: "700",
-    color: "#fff",
-    marginBottom: 4,
-  },
-  actionSubtitle: {
-    fontSize: 14,
-    color: "#fff",
-    opacity: 0.95,
   },
 });
