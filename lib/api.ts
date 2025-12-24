@@ -1,62 +1,27 @@
 // lib/api.ts - Complete API Integration
-import AsyncStorage from "@react-native-async-storage/async-storage";
+// lib/api.ts - Complete API Integration
 
 // Change this to your backend URL
-
 const API_BASE_URL =
-  process.env.EXPO_PUBLIC_API_URL || "http://localhost:8000/api";
-//const API_BASE_URL = "http://localhost:8000/api";
+  process.env.EXPO_PUBLIC_API_URL || "http://172.17.22.207:8000/api";
+
 // For Android emulator use: 'http://10.0.2.2:8000/api'
 // For iOS simulator use: 'http://localhost:8000/api'
 // For physical device use: 'http://YOUR_LOCAL_IP:8000/api'
-
-// Storage keys
-const TOKEN_KEY = "@auth_token";
-
-// Helper to get token
-const getToken = async (): Promise<string | null> => {
-  try {
-    return await AsyncStorage.getItem(TOKEN_KEY);
-  } catch (error) {
-    console.error("Error getting token:", error);
-    return null;
-  }
-};
-
-// Helper to save token
-export const saveToken = async (token: string): Promise<void> => {
-  try {
-    await AsyncStorage.setItem(TOKEN_KEY, token);
-  } catch (error) {
-    console.error("Error saving token:", error);
-  }
-};
-
-// Helper to clear token
-export const clearToken = async (): Promise<void> => {
-  try {
-    await AsyncStorage.removeItem(TOKEN_KEY);
-  } catch (error) {
-    console.error("Error clearing token:", error);
-  }
-};
 
 // Generic API call helper
 const apiCall = async (
   endpoint: string,
   method: "GET" | "POST" | "PUT" | "DELETE" = "GET",
   body?: any,
-  requiresAuth: boolean = false
+  token?: string | null
 ) => {
   const headers: any = {
     "Content-Type": "application/json",
   };
 
-  if (requiresAuth) {
-    const token = await getToken();
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
-    }
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
   }
 
   const config: RequestInit = {
@@ -88,36 +53,31 @@ const apiCall = async (
 // ============================================
 
 export const authAPI = {
-  register: async (name: string, email: string, password: string) => {
-    const data = await apiCall("/auth/register", "POST", {
-      name,
-      email,
-      password,
-    });
-    if (data.token) {
-      await saveToken(data.token);
-    }
-    return data;
+  register: async (params: {
+    name: string;
+    email: string;
+    phone?: string;
+    password: string;
+    confirmPassword: string;
+  }) => {
+    return await apiCall("/auth/signup", "POST", params);
   },
 
-  login: async (email: string, password: string) => {
-    const data = await apiCall("/auth/login", "POST", { email, password });
-    if (data.token) {
-      await saveToken(data.token);
-    }
-    return data;
+  login: async (
+    email: string,
+    password: string,
+    pushToken?: string
+  ): Promise<{
+    success: boolean;
+    message: string;
+    token?: string;
+    user?: any;
+  }> => {
+    return await apiCall("/auth/login", "POST", { email, password, pushToken });
   },
 
-  getMe: async () => {
-    return await apiCall("/auth/me", "GET", null, true);
-  },
-
-  updateProfile: async (name?: string, email?: string) => {
-    return await apiCall("/auth/profile", "PUT", { name, email }, true);
-  },
-
-  logout: async () => {
-    await clearToken();
+  getMe: async (token: string) => {
+    return await apiCall("/auth/me", "GET", null, token);
   },
 };
 

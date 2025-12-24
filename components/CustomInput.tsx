@@ -1,39 +1,56 @@
-import { View, Text, TextInput } from "react-native";
-import React, { useState } from "react";
-import { CustomInputProps } from "@/type";
+// components/CustomInput.tsx
+import { Ionicons } from "@expo/vector-icons";
+import React from "react";
+import { Text, TextInput, View } from "react-native";
 
+interface CustomInputProps {
+  label: string;
+  value: string;
+  onChangeText: (text: string) => void;
+  placeholder?: string;
+  secureTextEntry?: boolean;
+  keyboardType?: any;
+  autoCapitalize?: "none" | "sentences" | "words" | "characters";
+  containerStyle?: string;
+  icon?: string;
+}
 
 const CustomInput = ({
-  placeholder = "Enter text",
+  label,
   value,
   onChangeText,
-  label,
+  placeholder,
   secureTextEntry = false,
   keyboardType = "default",
+  autoCapitalize = "none",
+  containerStyle = "",
+  icon,
 }: CustomInputProps) => {
-  const [isFocused, setIsFocused] = useState(false);
-
   return (
-    <View className="w-full mb-4">
-      {label && (
-        <Text className="text-gray-700 font-semibold mb-1">{label}</Text>
-      )}
-
-      <TextInput
-        autoCapitalize="none"
-        autoCorrect={false}
-        value={value}
-        onChangeText={onChangeText}
-        secureTextEntry={secureTextEntry}
-        keyboardType={keyboardType}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
-        placeholder={placeholder}
-        placeholderTextColor="#888"
-        className={`border rounded-xl p-3 text-base bg-white ${
-          isFocused ? "border-primary" : "border-gray-300"
-        }`}
-      />
+    <View className={`mb-4 ${containerStyle}`}>
+      <Text className="text-[#7e22ce] font-semibold mb-2 text-base">
+        {label}
+      </Text>
+      <View className="flex-row items-center bg-white border-2 border-[#e9d5ff] rounded-2xl px-4 py-4 focus:border-[#a855f7]">
+        {icon && (
+          <Ionicons
+            name={icon as any}
+            size={20}
+            color="#a855f7"
+            style={{ marginRight: 12 }}
+          />
+        )}
+        <TextInput
+          className="flex-1 text-[#7e22ce] text-base"
+          value={value}
+          onChangeText={onChangeText}
+          placeholder={placeholder}
+          placeholderTextColor="#c4b5fd"
+          secureTextEntry={secureTextEntry}
+          keyboardType={keyboardType}
+          autoCapitalize={autoCapitalize}
+        />
+      </View>
     </View>
   );
 };

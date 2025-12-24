@@ -1,16 +1,19 @@
-import { View, Image, ImageSourcePropType, Platform } from "react-native";
-import React from "react";
-import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { Tabs } from "expo-router";
+import React from "react";
+import { Image, ImageSourcePropType, Platform, View } from "react-native";
 
+// ⭐ UPDATED TAB ICON (supports opacity + image tinting)
 const TabIcon = ({
   focused,
   icon,
   iconName,
+  iconStyle,
 }: {
   focused: boolean;
   icon?: ImageSourcePropType;
   iconName?: keyof typeof Ionicons.glyphMap;
+  iconStyle?: any;
 }) => {
   return (
     <View
@@ -22,7 +25,12 @@ const TabIcon = ({
         <Image
           source={icon}
           className="size-6"
-          style={{ tintColor: focused ? "#FE8C00" : "#878787" }}
+          style={[
+            {
+              tintColor: focused ? "#FE8C00" : "#878787", // active orange, inactive grey
+            },
+            iconStyle, // applies opacity fix
+          ]}
         />
       ) : (
         iconName && (
@@ -68,6 +76,7 @@ export default function TabLayout() {
           ),
         }}
       />
+
       <Tabs.Screen
         name="Upload"
         options={{
@@ -77,6 +86,7 @@ export default function TabLayout() {
           ),
         }}
       />
+
       <Tabs.Screen
         name="Alerts"
         options={{
@@ -86,6 +96,22 @@ export default function TabLayout() {
           ),
         }}
       />
+
+      {/* ⭐ NGO DETAILS TAB — CUSTOM ICON WITH GREY INACTIVE STATE */}
+      <Tabs.Screen
+        name="NgoDetails"
+        options={{
+          title: "NGO",
+          tabBarIcon: ({ focused }) => (
+            <TabIcon
+              focused={focused}
+              icon={require("../../assets/icons/star.png")} // your NGO icon
+            //  iconStyle={{ opacity: focused ? 1 : 0.35 }} // ⭐ makes it grey when NOT focused
+            />
+          ),
+        }}
+      />
+
       <Tabs.Screen
         name="Rewards"
         options={{
@@ -95,6 +121,7 @@ export default function TabLayout() {
           ),
         }}
       />
+
       <Tabs.Screen
         name="profile"
         options={{

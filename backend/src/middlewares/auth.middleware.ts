@@ -162,8 +162,10 @@
 // };
 
 // src/middlewares/auth.middleware.ts
-import { Response, NextFunction } from "express";
+import { NextFunction, Response } from "express";
+import User from "../models/User.model.js";
 import { AuthRequest } from "../types";
+import { verifyToken } from "../utils/jwt";
 
 export const protect = async (
   req: AuthRequest,
@@ -171,18 +173,60 @@ export const protect = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    // Temporary implementation - will be replaced with JWT verification
-    req.user = {
-      _id: "temp-user-id",
-      name: "Test User",
-      email: "test@example.com"
-    } as any;
-    
+    const authHeader = req.headers.authorization || req.headers.Authorization;
+
+    if (!authHeader || typeof authHeader !== "string") {
+      res.status(401).json({
+        success: false,
+        message: "Authorization header missing",
+      });
+      return;
+    }
+
+    if (!authHeader.startsWith("Bearer ")) {
+      res.status(401).json({
+        success: false,
+        message: "Invalid authorization format. Use Bearer <token>",
+      });
+      return;
+    }
+
+    const token = authHeader.split(" ")[1];
+    if (!token || token === "null" || token === "undefined") {
+      res.status(401).json({
+        success: false,
+        message: "Token missing",
+      });
+      return;
+    }
+
+    let decoded;
+    try {
+      decoded = verifyToken(token);
+    } catch (error: any) {
+      res.status(401).json({
+        success: false,
+        message: error.message || "Invalid or expired token",
+      });
+      return;
+    }
+
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      res.status(401).json({
+        success: false,
+        message: "User associated with this token no longer exists",
+      });
+      return;
+    }
+
+    req.user = user as any;
     next();
   } catch (error: any) {
-    res.status(401).json({
+    console.error("Auth Middleware Error:", error);
+    res.status(500).json({
       success: false,
-      message: "Not authorized"
+      message: "Authentication error occurred",
     });
   }
 };

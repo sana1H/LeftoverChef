@@ -1,30 +1,35 @@
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  Image,
-  StyleSheet,
-  Alert,
-  Modal,
-  TextInput,
-  Switch,
-} from "react-native";
-import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
 import * as ImagePicker from "expo-image-picker";
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
+import {
+    Alert,
+    Image,
+    Modal,
+    ScrollView,
+    StyleSheet,
+    Switch,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
+} from "react-native";
+import { useAuth } from "../context/AuthContext";
 
 const Profile = () => {
   const router = useRouter();
+  const { user: authUser, logout } = useAuth();
+
   const [user, setUser] = useState({
-    name: "John Doe",
-    email: "john.doe@example.com",
-    joinedDate: "January 2024",
-    recipesCreated: 24,
-    recipesSaved: 156,
-    wasteReduced: "45 kg",
+    name: authUser?.name || "Guest User",
+    email: authUser?.email || "guest@example.com",
+    joinedDate: authUser?.createdAt
+      ? new Date(authUser.createdAt).toLocaleDateString()
+      : "Recently joined",
+    recipesCreated: 0,
+    recipesSaved: 0,
+    wasteReduced: "0 kg",
     profileImage: null as string | null,
   });
 
@@ -140,12 +145,25 @@ const Profile = () => {
         text: "Logout",
         style: "destructive",
         onPress: () => {
-          // Handle logout logic here
-          router.replace("/auth/sign-in");
+          logout();
         },
       },
     ]);
   };
+
+  // Keep local display name/email in sync when auth user changes
+  useEffect(() => {
+    if (authUser) {
+      setUser((prev) => ({
+        ...prev,
+        name: authUser.name,
+        email: authUser.email,
+        joinedDate: authUser.createdAt
+          ? new Date(authUser.createdAt).toLocaleDateString()
+          : prev.joinedDate,
+      }));
+    }
+  }, [authUser]);
 
   const renderEditModal = () => (
     <Modal

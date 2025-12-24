@@ -1,109 +1,38 @@
-// // src/models/User.ts
-// import mongoose, { Schema, Document } from "mongoose";
+import mongoose from "mongoose";
+const { Schema } = mongoose;
 
-// export interface IUser extends Document {
-//   name: string;
-//   email: string;
-//   password: string;
-//   avatar?: string;
-//   role: "user" | "admin";
-//   points: number;
-//   donationsCount: number;
-//   isActive: boolean;
-//   lastLogin?: Date;
-//   createdAt: Date;
-//   updatedAt: Date;
-// }
+const userSchema = new Schema(
+  {
+    // BASIC INFO
+    name: { type: String, required: true, trim: true },
+    email: { type: String, required: true, unique: true, lowercase: true },
 
-// const UserSchema: Schema = new Schema(
-//   {
-//     name: {
-//       type: String,
-//       required: true,
-//       trim: true,
-//     },
-//     email: {
-//       type: String,
-//       required: true,
-//       unique: true,
-//       lowercase: true,
-//     },
-//     password: {
-//       type: String,
-//       required: true,
-//     },
-//     avatar: {
-//       type: String,
-//       default: "",
-//     },
-//     role: {
-//       type: String,
-//       enum: ["user", "admin"],
-//       default: "user",
-//     },
-//     points: {
-//       type: Number,
-//       default: 0,
-//     },
-//     donationsCount: {
-//       type: Number,
-//       default: 0,
-//     },
-//     isActive: {
-//       type: Boolean,
-//       default: true,
-//     },
-//     lastLogin: {
-//       type: Date,
-//     },
-//   },
-//   {
-//     timestamps: true,
-//   }
-// );
+    // PASSWORD FOR BOTH APP + WEBSITE
+    passwordHash: { type: String, required: true },
 
-// export default mongoose.model<IUser>("User", UserSchema);
+    // OPTIONAL FIELDS
+    phone: { type: String, default: "" },
+    avatar: { type: String, default: "" },
 
+    // ROLES SUPPORTED BY BOTH APP + WEBSITE
+    role: {
+      type: String,
+      enum: ["user", "donor", "ngo", "admin", "delivery"],
+      default: "user",
+    },
 
-// // models/User.js
-// import mongoose from 'mongoose'
-// const { Schema } = mongoose
+    // WEBSITE FEATURES
+    points: { type: Number, default: 0 },
+    donationsCount: { type: Number, default: 0 },
+    isActive: { type: Boolean, default: true },
+    lastLogin: { type: Date },
 
-// const userSchema = new Schema({
-//   name: { type: String, required: true },
-//   email: { type: String, required: true, unique: true },
-//   phone: String,
-//   role: { type: String, enum: ['donor', 'ngo', 'admin', 'delivery'], default: 'ngo' },
-//   passwordHash: String,
-//   createdAt: { type: Date, default: Date.now }
-// })
+    // APP FEATURES
+    pushToken: { type: String },
+    lastActiveAt: { type: Date },
+    appPreferences: { type: Schema.Types.Mixed },
+  },
+  { timestamps: true }
+);
 
-// export default mongoose.model('User', userSchema)
-// models/User.js
-import mongoose from 'mongoose'
-const { Schema } = mongoose
-
-/**
- * Kept all original fields (name, email, phone, role, passwordHash, createdAt)
- * Added optional fields used by the app:
- *  - pushToken (for notifications)
- *  - lastActiveAt
- *  - appPreferences (flexible JSON)
- *
- * Default role preserved to avoid breaking website logic.
- */
-const userSchema = new Schema({
-  name: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  phone: String,
-  role: { type: String, enum: ['donor', 'ngo', 'admin', 'delivery'], default: 'ngo' },
-  passwordHash: String,
-  // app fields (optional)
-  pushToken: { type: String },             // device push token for notifications (optional)
-  lastActiveAt: { type: Date },
-  appPreferences: { type: Schema.Types.Mixed }, // optional JSON for app UX preferences
-  createdAt: { type: Date, default: Date.now }
-})
-
-userSchema.index({ role: 1 });
-export default mongoose.model('User', userSchema)
+export default mongoose.model("User", userSchema);

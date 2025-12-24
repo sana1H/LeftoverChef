@@ -1,24 +1,25 @@
+// app/(tabs)/Upload.tsx
+import { Ionicons } from "@expo/vector-icons";
+import * as Camera from "expo-camera";
+import * as ImagePicker from "expo-image-picker";
+import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-  SafeAreaView,
+  ActivityIndicator,
   Alert,
   Image,
-  ActivityIndicator,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons } from "@expo/vector-icons";
-import * as ImagePicker from "expo-image-picker";
-import * as Camera from "expo-camera";
-import { useRouter } from "expo-router";
 
 interface Prediction {
   freshness: "Fresh" | "Stale";
-  confidence: number; // 0–1
+  confidence: number;
 }
 
 export default function Upload() {
@@ -29,7 +30,7 @@ export default function Upload() {
   const [prediction, setPrediction] = useState<Prediction | null>(null);
   const [showResults, setShowResults] = useState(false);
 
-  // Permission for camera
+  // Camera Permission
   const requestCameraPermission = async () => {
     try {
       const { status } = await Camera.requestCameraPermissionsAsync();
@@ -39,7 +40,7 @@ export default function Upload() {
     }
   };
 
-  // Permission for gallery
+  // Gallery Permission
   const requestGalleryPermission = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
@@ -49,7 +50,7 @@ export default function Upload() {
     return true;
   };
 
-  // Take a photo
+  // Take Photo (NO SIGN-IN REQUIRED)
   const takePhoto = async () => {
     const hasPermission = await requestCameraPermission();
     if (!hasPermission) {
@@ -69,7 +70,7 @@ export default function Upload() {
     }
   };
 
-  // Pick from gallery
+  // Pick From Gallery (NO SIGN-IN REQUIRED)
   const pickImage = async () => {
     const hasPermission = await requestGalleryPermission();
     if (!hasPermission) return;
@@ -86,7 +87,7 @@ export default function Upload() {
     }
   };
 
-  // Upload & check freshness
+  // Upload & Check Freshness (NO SIGN-IN REQUIRED)
   const handleUpload = async () => {
     if (!selectedImage) {
       Alert.alert("No Image", "Please upload a food image first.");
@@ -96,10 +97,8 @@ export default function Upload() {
     setIsUploading(true);
 
     try {
-      // Simulate actual ML API delay
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      // MOCK – Your ML model will return real values later.
       const mock: Prediction =
         Math.random() > 0.5
           ? { freshness: "Fresh", confidence: 0.92 }
@@ -110,8 +109,7 @@ export default function Upload() {
 
       Alert.alert(
         "Analysis Complete",
-        `Food is detected as: ${mock.freshness}`,
-        [{ text: "OK" }]
+        `Food is detected as: ${mock.freshness}`
       );
     } catch {
       Alert.alert("Error", "Unable to analyze image. Try again.");
@@ -120,7 +118,6 @@ export default function Upload() {
     }
   };
 
-  // Reset
   const handleReset = () => {
     setSelectedImage(null);
     setPrediction(null);
@@ -155,9 +152,9 @@ export default function Upload() {
         </LinearGradient>
 
         <View style={styles.content}>
-          {/* Upload Section */}
           {!selectedImage ? (
             <>
+              {/* UPLOAD CARD */}
               <View style={styles.uploadCard}>
                 <LinearGradient
                   colors={["#fae8ff", "#fce7f3"]}
@@ -196,6 +193,7 @@ export default function Upload() {
               </TouchableOpacity>
             </>
           ) : (
+            // PREVIEW SECTION
             <View style={styles.previewSection}>
               <View style={styles.imageCard}>
                 <Image
@@ -238,7 +236,7 @@ export default function Upload() {
                 </TouchableOpacity>
               </View>
 
-              {/* RESULTS */}
+              {/* RESULT */}
               {showResults && prediction && (
                 <View style={styles.resultsCard}>
                   <View style={styles.resultsHeader}>
@@ -295,7 +293,6 @@ export default function Upload() {
             </View>
           )}
 
-          {/* Info Section */}
           <View style={styles.infoCard}>
             <View style={styles.infoHeader}>
               <Ionicons name="information-circle" size={20} color="#a855f7" />
@@ -319,7 +316,7 @@ export default function Upload() {
             <View style={styles.infoItem}>
               <Text style={styles.infoNumber}>3</Text>
               <Text style={styles.infoText}>
-                You get a prediction whether food is **fresh or stale**
+                You get a freshness prediction instantly
               </Text>
             </View>
           </View>
@@ -329,7 +326,6 @@ export default function Upload() {
   );
 }
 
-// STYLES
 const styles = StyleSheet.create({
   container: { flex: 1 },
 
@@ -367,9 +363,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
 
-  content: {
-    padding: 20,
-  },
+  content: { padding: 20 },
 
   uploadCard: {
     borderRadius: 24,
@@ -419,9 +413,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
 
-  previewSection: {
-    marginBottom: 24,
-  },
+  previewSection: { marginBottom: 24 },
 
   imageCard: {
     borderRadius: 24,
@@ -481,7 +473,6 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
 
-  // RESULTS SECTION
   resultsCard: {
     backgroundColor: "#fff",
     padding: 22,
@@ -504,9 +495,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 
-  confidenceContainer: {
-    marginTop: 8,
-  },
+  confidenceContainer: { marginTop: 8 },
 
   confidenceLabel: {
     fontSize: 16,

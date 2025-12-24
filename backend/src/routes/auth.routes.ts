@@ -99,13 +99,17 @@
 
 // src/routes/auth.routes.ts
 import { Router } from "express";
-import { register, login, getMe } from "../controllers/auth.controller";
+import { getMe, login, signup } from "../controllers/auth.controller";
 import { protect } from "../middlewares/auth.middleware";
 
 const router = Router();
 
-router.post("/register", register);
+// Preferred endpoints
+router.post("/signup", signup);
 router.post("/login", login);
 router.get("/me", protect, getMe);
+
+// Backwards-compatible legacy endpoint
+router.post("/register", signup);
 
 export default router;
